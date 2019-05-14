@@ -51,9 +51,20 @@ namespace Lambdas_and_LINQ
             Console.WriteLine("Raise to Power of 2");
             numlist.Select(x => Pow(2, x)).ToList().ForEach(x => Console.Write($"{x} "));
             Console.WriteLine();
+            Console.WriteLine("Raise to Power of 2 with zip");
+            numlist.Zip(Enumerable.Repeat(2,numlist.Count()),(x,y)=>Pow(y,x)).ToList().ForEach(x => Console.Write($"{x} "));
+            Console.WriteLine();
 
             Console.WriteLine("Concat strings");
             Console.WriteLine(wordlist.Aggregate(Append));
+            Console.WriteLine();
+            Console.WriteLine(wordlist.Aggregate("",Append, s=> new string(s.Reverse().ToArray())));
+            Console.WriteLine();           
+            Console.WriteLine(new string(wordlist.Aggregate("", Append).Reverse().ToArray()));
+            Console.WriteLine();
+
+            Console.WriteLine("Sum numlist");
+            Console.WriteLine(numlist.Aggregate(Sum));
             Console.WriteLine();
 
             Console.WriteLine("repeated exponentiation, also known as tetration");
@@ -66,16 +77,19 @@ namespace Lambdas_and_LINQ
                 return res;
             };
 
-            Func<int, int, int> tetration2 = (x, y) =>
-                 Enumerable.Range(0, y-1).Aggregate(seed: x,func: (k, index) => Pow(k, x));
+            Func<int, int, int> tetration2 = (@base, times) =>
+                 Enumerable.Range(0, times-1).Aggregate(seed: @base,func: (k, index) => Pow(k, @base));
 
-            Func<int, int, int> tetration1 = (x, y) =>
-                Enumerable.Repeat(x, y).Aggregate(func: (k, index) => Pow(k, x));
+            Func<int, int, int> tetration0 = (@base, times) =>
+                Enumerable.Repeat(@base, times).Aggregate(func: (k, index) => Pow(k, @base));
+
+            Func<int, int, int> tetration1 = (@base, times) =>
+                Enumerable.Repeat(@base, times).Aggregate(Pow);
 
             Console.WriteLine("Printing 2↑↑4");
-            Console.WriteLine(tetration2(2,4));
+            Console.WriteLine(tetration1(2,4));
             Console.WriteLine("Printing 3↑↑2");
-            Console.WriteLine(tetration2(3,2));
+            Console.WriteLine(tetration1(3,2));
 
 
             Func<BigInteger, BigInteger, BigInteger> PowBig = (x, y) => Enumerable.Repeat(y, (int)x).Aggregate((a,b)=>BigInteger.Multiply(a, b));
